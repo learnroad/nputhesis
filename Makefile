@@ -5,4 +5,4 @@ sample.pdf: sample.tex ref.bib
 
 .PHONY: clean
 clean:
-	-rm *.pdf *.log *.blg *.bbl *.aux *.fdb_latexmk *.fls *.nlg *.nlo *.nls
+	latexmk -c

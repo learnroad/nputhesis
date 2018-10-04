@@ -1,28 +1,112 @@
-%% FileName: nputhesis.cls
-%% Author: Yang Zongze (yangzongze@gmail.com)
-
-\NeedsTeXFormat{LaTeX2e}
-\ProvidesClass{nputhesis}[2018/10/03 v0.5 NPU]
-
-\def\npu@work@bib{none}
-
-\RequirePackage{xkeyval}
-\DeclareOptionX{workbib}{\def\npu@work@bib{#1}}
-\ExecuteOptionsX{workbib=none}
-\ProcessOptionsX \relax
-
-\newif\if@npu@phd
+% \iffalse meta-comment
+% 
+% Copyright (C) 2018 by Zongze Yang <yangzongze@gmail.com>
+% 
+% It may be distributed and/or modified under the
+% conditions of the LaTeX Project Public License, either version 1.3b
+% of this license or (at your option) any later version.
+% The latest version of this license is in
+%    https://www.latex-project.org/lppl.txt
+% and version 1.3b or later is part of all distributions of LaTeX 
+% version 2005/12/01 or later.
+%
+% \fi
+%
+% \iffalse
+%<*driver>
+\ProvidesFile{nputhesis.dtx}
+%</driver>
+%<package>\NeedsTeXFormat{LaTeX2e}
+%<package>\ProvidesClass{nputhesis}
+%<*package>
+    [2018/10/04 v0.6 nputhesis]
+%</package>
+%<*driver>
+\documentclass{ltxdoc}
+\usepackage{xeCJK}
+\EnableCrossrefs
+\CodelineIndex
+\RecordChanges
+\begin{document}
+  \DocInput{nputhesis.dtx}
+  \PrintChanges
+  \PrintIndex
+\end{document}
+%</driver>
+% \fi
+%
+% \changes{v0.6}{2018/10/04}{Initial version use dtx}
+% 
+% \GetFileInfo{nputhesis.dtx}
+% 
+% \DoNotIndex{\newcommmand, \newenvironment}
+%
+% \title{The \textsf{nputhesis} class\thanks{This document
+% corresponds to \textsf{nputhesis}~\fileversion, dated \filedate.}}
+% \author{Zongze Yang\\ \texttt{yangzongze@gmail.com}}
+%
+% \date{\filedate}
+% \maketitle
+% \tableofcontents
+%
+% \StopEventually{}
+%
+% \section{Introduction}
+%
+% \section{Usage}
+%
+% \section{Implementation}
+% 我们使用一些布尔变量实现文档的选项设置
+%    \begin{macrocode}
+%<*package>
 \newif\if@npu@blankinfo
-\@npu@blankinfofalse
-\DeclareOption{phd}{\@npu@phdtrue}
-\DeclareOption{ma}{\@npu@phdfalse}
-\DeclareOption{blankinfo}{\@npu@blankinfotrue}
-\DeclareOption{UTF8}{\PassOptionsToPackage{\CurrentOption}{ctex}}
-\DeclareOption*{\PassOptionsToClass{\CurrentOption}{book}}
-\ExecuteOptions{phd}
-\ProcessOptions \relax
+\newif\if@npu@phd
+\newif\if@npu@bib@biblatex
+\newif\if@npu@bib@multibib
+\newif\if@npu@bib@none
+\def\set@npu@phd{\@npu@phdtrue}
+\def\set@npu@ma{\@npu@phdfalse}
+\def\set@npu@bib@false{%
+  \@npu@bib@biblatexfalse
+  \@npu@bib@multibibfalse
+  \@npu@bib@nonefalse
+}
+%    \end{macrocode}
+% 使用 xkeyval 声明文档选项 
+%    \begin{macrocode}
+\RequirePackage{xkeyval}
+\DeclareOptionX{UTF8}{\PassOptionsToPackage{\CurrentOption}{ctex}}
+%    \end{macrocode}
+% 声明选项 blankinfo, 用于控制是否现实空白页标识信息.
+%    \begin{macrocode}
+\DeclareOptionX{blankinfo}[false]{\csname @npu@blankinfo#1\endcsname}
+%    \end{macrocode}
+% 声明选项 thesistype, 可选参数为 phd 和 ma, 用于选择文档类型
+% : 博士论文还是硕士论文.
+%    \begin{macrocode}
+\DeclareOptionX{thesistype}[phd]{\csname set@npu@#1\endcsname}
+%    \end{macrocode}
+% 声明选项 workbib, 可选参数有 biblatex, multibib, none, 用于选
+% 择是否自动生成论文成果内容 
+%    \begin{macrocode}
+\DeclareOptionX{workbib}[none]{\set@npu@bib@false\csname @npu@bib@#1true\endcsname}
+%    \end{macrocode}
+% 声明选项 phd 和 ma, 要废齐的选项, 被 thesistype 代替, 请使用 thesistype.
+%    \begin{macrocode}
+\DeclareOptionX{phd}{\@npu@phdtrue}
+\DeclareOptionX{ma}{\@npu@phdfalse}
+%    \end{macrocode}
+% 该文类基于 book 类实现, 加载book 文类.
+%    \begin{macrocode}
+\DeclareOptionX*{\PassOptionsToClass{\CurrentOption}{book}}
+\ExecuteOptionsX{thesistype=phd, workbib=none}
+\ProcessOptionsX \relax
 \LoadClass{book}
-
+%</package>
+%    \end{macrocode}
+% 加载需要的宏包
+%    \begin{macrocode}
+%<*package>
 \RequirePackage{geometry}
 \RequirePackage{xcolor}
 \RequirePackage{fancyhdr}
@@ -40,10 +124,9 @@
 \RequirePackage{graphicx}
 \RequirePackage[heading=true,zihao=-4]{ctex}
 \RequirePackage{ifxetex}
-\ifxetex
-  \setmainfont{Times New Roman}
-\fi
-
+%    \end{macrocode}
+% 设置页面版式和格式
+%    \begin{macrocode}
 \geometry{paperwidth=210mm,paperheight=297mm,%
   left=2.5cm,right=2.5cm,top=2.54cm,bottom=2.54cm}
 \topmargin=-10.4mm
@@ -51,8 +134,21 @@
 \footskip=8mm
 \headsep=5mm
 
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[EC]{\songti\zihao{-5}\npu@rightmark}
+\fancyhead[OC]{\songti\zihao{-5}\leftmark}
+\fancyfoot[C]{\songti\zihao{5}\thepage}
+\renewcommand{\headrule}{%
+  \hrule width\headwidth height2.8pt \vspace{1pt}%
+  \hrule width\headwidth height0.8pt}
+\fancypagestyle{plain}{\thispagestyle{fancy}}
+\newcommand{\clearpagestyle}{\clearpage{\pagestyle{empty}\cleardoublepage}}
+%    \end{macrocode}
+% 设置默认章节标题格式
+%    \begin{macrocode}
 \ifx\ctexset\undefined
-  \CTEXsetup[ % name={,}, number={\arabic{chapter}},% use default value
+  \CTEXsetup[% name={,}, number={\arabic{chapter}},% use ctex default value
     beforeskip={20pt}, afterskip={20pt}]{chapter}
   \CTEXsetup[nameformat={\heiti\zihao{3}\bf}]{chapter}
   \CTEXsetup[titleformat={\heiti\zihao{3}}]{chapter}
@@ -64,8 +160,6 @@
   }
   % title format of chapter
   \ctexset{
-    % chapter/name={,},                % use default value in ctex
-    % chapter/number=\arabic{chapter}, % use default value in ctex
     chapter/beforeskip={20bp},
     chapter/afterskip={20bp},
     chapter/format={\heiti\zihao{3}\centering}
@@ -85,7 +179,18 @@
     subsection/format={\heiti\zihao{-4}}
   }
 \fi
-% content setting
+%    \end{macrocode}
+% 设置正文默认字体大小, 并设置默认英文字体为 Times New Roman.
+%    \begin{macrocode}
+% set normal font size
+\renewcommand{\normalsize}{\zihao{-4}}
+\linespread{1.5}
+\ifxetex
+  \setmainfont{Times New Roman}
+\fi
+%    \end{macrocode}
+% 目录字体设置
+%    \begin{macrocode}
 \def\@contentfont{\songti\zihao{-4}}
 \titlecontents{chapter}[0pt]{\@contentfont}
   {\thecontentslabel\hspace{.5em}}{}
@@ -96,25 +201,9 @@
 \titlecontents{subsection}[30pt]{\@contentfont}
   {\thecontentslabel\quad}{}
   {\hspace{.5em}\titlerule*{.}\contentspage}
-
-\pagestyle{fancy}
-% \renewcommand\chaptermark[1]{\markboth{%
-%   \if@mainmatter%
-%     %\ifnum\arabic{chapter}>0%
-%       \arabic{chapter}\quad%
-%     %\fi%
-%   \fi#1}{}}
-\fancyhf{}
-\fancyhead[EC]{\songti\zihao{-5}\npu@rightmark}
-\fancyhead[OC]{\songti\zihao{-5}\leftmark}
-\fancyfoot[C]{\songti\zihao{5}\thepage}
-\renewcommand{\headrule}{%
-  \hrule width\headwidth height2.8pt \vspace{1pt}%
-  \hrule width\headwidth height0.8pt}
-\fancypagestyle{plain}{\thispagestyle{fancy}}
-\newcommand{\clearpagestyle}{\clearpage{\pagestyle{empty}\cleardoublepage}}
-
-% define var
+%    \end{macrocode}
+% 定义变量, 用于存储包括论文题目, 作者,导师等信息.
+%    \begin{macrocode}
 \def\title{\@ifnextchar[\@@title{\@@title[]}}
 \def\author{\@ifnextchar[\@@author{\@@author[]}}
 \def\major{\@ifnextchar[\@@major{\@@major[]}}
@@ -144,12 +233,9 @@
 \else
   \def\npu@degreename@en{Master}
 \fi
-
-% set normal font size
-\renewcommand{\normalsize}{\zihao{-4}}
-\linespread{1.5}
-
-% cover
+%    \end{macrocode}
+% 定义外封面
+%    \begin{macrocode}
 \def\makeoutercover{
   \begin{titlepage}
     \linespread{1.25}
@@ -210,7 +296,9 @@
     \end{center}
   \end{titlepage}
   \clearpagestyle}
-
+%    \end{macrocode}
+% 定义内封面
+%    \begin{macrocode}
 \def\makeinnercover@zh{
   \begin{titlepage}
     \linespread{1.25}
@@ -267,7 +355,9 @@
     \end{center}
   \end{titlepage}
   \clearpagestyle}
-
+%    \end{macrocode}
+% 定义英文封面
+%    \begin{macrocode}
 \def\makeinnercover@en{
   \begin{titlepage}
     \linespread{1.25}
@@ -298,7 +388,18 @@
     \end{center}
   \end{titlepage}
   \clearpagestyle}
-
+%    \end{macrocode}
+% 整合以上封面为一个命令 makecover
+%    \begin{macrocode}
+\def\makecover{\makeoutercover\makeinnercover@zh\makeinnercover@en}
+%    \end{macrocode}
+% 正文之前使用罗马数字编号
+%    \begin{macrocode}
+\let\npu@frontmatter\frontmatter
+\def\frontmatter{\npu@frontmatter\pagenumbering{Roman}}
+%    \end{macrocode}
+% 重定义 cleardoublepage, 用于实现 blankinfo 选项的功能.
+%    \begin{macrocode}
 \def\cleardoublepage{\clearpage\if@twoside \ifodd\c@page\else
   \hbox{}
   \vspace*{\fill}
@@ -311,7 +412,9 @@
   \thispagestyle{empty}
   \newpage
   \if@twocolumn\hbox{}\newpage\fi\fi\fi}
-
+%    \end{macrocode}
+% 定义中英文摘要环境
+%    \begin{macrocode}
 \newenvironment{abstract}{%
   \chapter{\npu@abstract}%\addcontentsline{toc}{chapter}{\npu@abstract}%
   \newenvironment{keywords}{%
@@ -322,28 +425,78 @@
   \chapter{\npu@Abstract}%\addcontentsline{toc}{chapter}{\npu@Abstract}%
   \newenvironment{Keywords}{%
     \vspace{2\baselineskip}\par\textbf{\npu@Keywords\npu@comma}}{}}{}
-
-\def\makecover{\makeoutercover\makeinnercover@zh\makeinnercover@en}
-\let\npu@frontmatter\frontmatter
-\def\frontmatter{\npu@frontmatter\pagenumbering{Roman}}
-
-\DeclareCaptionFont{song}{\songti\zihao{5}}  % command defined in package caption
-\captionsetup{labelsep=quad, font=song}
-\setlength{\abovecaptionskip}{10pt}
-\setlength{\belowcaptionskip}{10pt}
-\renewcommand\thetable{\arabic{chapter}-\arabic{table}}
-\renewcommand\thefigure{\arabic{chapter}-\arabic{figure}}
-\renewcommand\theequation{\arabic{chapter}-\arabic{equation}}
-
+%    \end{macrocode}
+% 附录自动以英文字母编号
+%    \begin{macrocode}
 \let\npu@chapter\chapter
 \def\npu@star@chapter#1{\npu@chapter{#1}}
 \def\chapter{\secdef\npu@chapter\npu@star@chapter}
-
 \newcounter{npu@c@appendix}
 \setcounter{npu@c@appendix}{0}
-\def\Appendix{ \addtocounter{npu@c@appendix}{1}\chapter{\npu@appendix\Alph{npu@c@appendix}}}
+\def\Appendix{\addtocounter{npu@c@appendix}{1}\chapter{\npu@appendix\Alph{npu@c@appendix}}}
+%    \end{macrocode}
+% 致谢章节
+%    \begin{macrocode}
 \def\Thanks{\chapter{\npu@thanks}}
+%    \end{macrocode}
+% 参加科研工作章节, 设置标题内容
+%    \begin{macrocode}
+\newcommand\Work{\chapter{\npu@work}}
+\newcommand\papersection{\section*{\npu@work@paper}}
+\newcommand\researchsection{\section*{\npu@work@research}}
+%    \end{macrocode}
+% 科研工作部分自动生成成果
+%    \begin{macrocode}
+\RequirePackage{xstring}
+\if@npu@bib@biblatex%
+  \RequirePackage[backend=biber, style=gb7714-2015,
+  %               gbnamefmt=none,  % gbnamefmt option need package version v1.0k.
+                  doi=false]{biblatex}
+  \newcommand{\makeauthorbold}[1]{%
+    \DeclareNameFormat{author}{%
+      \ifthenelse{\value{listcount}=1}
+      {%
+        {\expandafter\IfSubStr{#1}{\namepartfamily\namepartgiven}{\mkbibbold{\namepartfamily\addspace \namepartgiveni}}{\namepartfamily\addspace \namepartgiveni}}
+        %
+      }{\ifnumless{\value{listcount}}{\value{liststop}}
+          {\expandafter\IfSubStr{#1}{\namepartfamily\namepartgiven}{\mkbibbold{\addcomma\addspace \namepartfamily\addspace \namepartgiveni}}{\addcomma\addspace \namepartfamily\addspace \namepartgiveni}}
+          {\expandafter\IfSubStr{#1}{\namepartfamily\namepartgiven}{\mkbibbold{\addcomma\addspace \namepartfamily\addspace \namepartgiveni\isdot}}{\addcomma\addspace \namepartfamily\addspace \namepartgiveni\isdot}}%
+        }
+      \ifthenelse{\value{listcount}<\value{liststop}}
+      {\addcomma\space}
+    }
+  }
+  \newcommand\npuprintpub[2]{
+    \begin{refsection}
+      \makeauthorbold{#1}
+      \nocite{#2}
+      \printbibliography[heading=subbibliography, title=\npu@work@paper]
+    \end{refsection}
+  }%
+  \newcommand\npuchoosebib[2]{#1}
+\else
+  \newcommand\npuchoosebib[2]{#2}
+\fi
+\if@npu@bib@multibib
+  \RequirePackage{multibib}
+  \newcites{@work}{\npu@work@paper}
+  \newcommand\npuprintpub[3][nputhesis]{%
+    \let\orig@chapter\chapter
+    \let\chapter\section
+    \usecounter{enumiv}
+    \nocite@work{#3}
+    \bibliographystyle@work{#1}
+    \bibliography@work{#2}
+    \let\chapter\orig@chapter
+  }
+\fi
 
+\AtBeginDocument{%
+  \@ifpackageloaded{biblatex}{\renewcommand\npuchoosebib[2]{#1}}{}
+}
+%    \end{macrocode}
+% 声明页
+%    \begin{macrocode}
 \def\statement{
   \begin{titlepage}
     \linespread{1.5}
@@ -370,88 +523,9 @@
     \hfill\npu@a@signature\npu@comma\underline{\qquad\qquad\qquad}\par
     \hfill\hskip8.5cm \npu@ymd
   \end{titlepage}}
-
-% ref amsthdoc.pdf
-\newtheoremstyle{nputheorem}% name
-  {0pt}% Space above
-  {0pt}% Space below
-  {\itshape}% Body font
-  {}% Indent amount
-  {\bfseries}% Theorem head font
-  {}% Punctuation after theorem head
-  {.5em}% Space after theorem head
-  {}% Theorem head spec (can be left empty, meaning ‘normal’ )
-
-\theoremstyle{nputheorem} % set default style to nputheorem
-
-\input{nputhesis.cfg}
-
-\AtBeginDocument{% fixed output error when load natbib and use nputhesis.bst.
-  \@ifpackageloaded{natbib}{}{%
-    \let\@ldbibitem\bibitem
-    \def\gobble@ption[#1]{}
-    \def\bibitem{\expandafter\@ldbibitem\gobble@ption}
-    \def\bibpunct#1#2#3#4#5#6{}}}
-
-\newcommand\Work{\chapter{\npu@work}}
-\newcommand\papersection{\section*{\npu@work@paper}}
-\newcommand\researchsection{\section*{\npu@work@research}}
-
-\RequirePackage{xstring}
-\expandafter\IfSubStr\expandafter{\npu@work@bib}{biblatex}%
-{%
-  \RequirePackage[backend=biber, style=gb7714-2015,
-  %               gbnamefmt=none,  % gbnamefmt option need package version v1.0k.
-                  doi=false]{biblatex}
-  \newcommand{\makeauthorbold}[1]{%
-    \DeclareNameFormat{author}{%
-      \ifthenelse{\value{listcount}=1}
-      {%
-        {\expandafter\IfSubStr{#1}{\namepartfamily\namepartgiven}{\mkbibbold{\namepartfamily\addspace \namepartgiveni}}{\namepartfamily\addspace \namepartgiveni}}
-        %
-      }{\ifnumless{\value{listcount}}{\value{liststop}}
-          {\expandafter\IfSubStr{#1}{\namepartfamily\namepartgiven}{\mkbibbold{\addcomma\addspace \namepartfamily\addspace \namepartgiveni}}{\addcomma\addspace \namepartfamily\addspace \namepartgiveni}}
-          {\expandafter\IfSubStr{#1}{\namepartfamily\namepartgiven}{\mkbibbold{\addcomma\addspace \namepartfamily\addspace \namepartgiveni\isdot}}{\addcomma\addspace \namepartfamily\addspace \namepartgiveni\isdot}}%
-        }
-      \ifthenelse{\value{listcount}<\value{liststop}}
-      {\addcomma\space}
-    }
-  }
-  \newcommand\npuprintpub[2]{
-    \begin{refsection}
-      \makeauthorbold{#1}
-      \nocite{#2}
-      \printbibliography[heading=subbibliography, title=\npu@work@paper]
-    \end{refsection}
-  }%
-  \newcommand\npuchoosebib[2]{#1}
-}%
-{%
-  \newcommand\npuchoosebib[2]{#2}
-  \expandafter\IfSubStr\expandafter{\npu@work@bib}{multibib}
-  {%
-    \RequirePackage{multibib}
-    \newcites{@work}{\npu@work@paper}
-    \newcommand\npuprintpub[3][nputhesis]{%
-      \let\orig@chapter\chapter
-      \let\chapter\section
-      \usecounter{enumiv}
-      \nocite@work{#3}
-      \bibliographystyle@work{#1}
-      \bibliography@work{#2}
-      \let\chapter\orig@chapter
-    }
-  }%
-  {%
-    % \expandafter\IfSubStr\expandafter{\npu@work@bib}{none}{}{}
-    % do nothing, may be output some message
-  }%
-}%
-
-\AtBeginDocument{%
-  \@ifpackageloaded{biblatex}{\renewcommand\npuchoosebib[2]{#1}}{}
-}
-
+%    \end{macrocode}
+% 定义双栏符号表 
+%    \begin{macrocode}
 \RequirePackage{nomencl}   % add symbol notation
 \RequirePackage{multicol}  % for two column notation
 % \AtEndPreamble{\makenomenclature}
@@ -485,5 +559,89 @@
   \end{multicols}
   \setlength{\columnsep}{\npu@columnsep@save}
   \nompostamble}
-
+%    \end{macrocode}
+% 图标格式设置
+%    \begin{macrocode}
+\DeclareCaptionFont{song}{\songti\zihao{5}}  % command defined in package caption
+\captionsetup{labelsep=quad, font=song}
+\setlength{\abovecaptionskip}{10pt}
+\setlength{\belowcaptionskip}{10pt}
+\renewcommand\thetable{\arabic{chapter}-\arabic{table}}
+\renewcommand\thefigure{\arabic{chapter}-\arabic{figure}}
+\renewcommand\theequation{\arabic{chapter}-\arabic{equation}}
+%    \end{macrocode}
+% 定义定理环境
+%    \begin{macrocode}
+% ref amsthdoc.pdf
+\newtheoremstyle{nputheorem}% name
+  {0pt}% Space above
+  {0pt}% Space below
+  {\itshape}% Body font
+  {}% Indent amount
+  {\bfseries}% Theorem head font
+  {}% Punctuation after theorem head
+  {.5em}% Space after theorem head
+  {}% Theorem head spec (can be left empty, meaning ‘normal’ )
+\theoremstyle{nputheorem} % set default style to nputheorem
+%    \end{macrocode}
+% 配置信息载入
+%    \begin{macrocode}
+\def\npu@degreename@zh{\if@npu@phd 博士\else 硕士\fi}
+\def\npu@comma{~:~}
+\def\npu@schoolno{学校代码}
+\def\npu@classno{分类号}
+\def\npu@secretlevel{密级}
+\def\npu@authorno{学号}
+\def\npu@title{题目}
+\def\npu@author{作者}
+\def\npu@major{学科、专业}
+\def\npu@supervisor{指导教师}
+\def\npu@applydate{申请学位日期}
+\def\npu@schoolname{西北工业大学}
+\def\npu@degree{\npu@degreename@zh 学位论文}
+\def\npu@degreeclass{(学位研究生)}
+\def\npu@rightmark{西北工业大学\npu@degreename@zh 学位论文}
+\def\npu@Abstract{Abstract}
+\def\npu@abstract{摘\quad 要}
+\def\npu@Keywords{Key words}
+\def\npu@keywords{关键词}
+\def\npu@contents{目\quad 录}
+\def\npu@nomname{符号表}
+\def\npu@appendix{附\quad 录}
+\def\npu@thanks{致\quad 谢}
+\def\npu@work{攻读\npu@degreename@zh 学位期间发表的学术论文和参加科研情况}
+\def\npu@work@paper{发表学术论文}
+\def\npu@work@research{参加科研情况}
+\def\npu@p@statement{学位论文知识产权声明书}
+\def\npu@c@statement{学位论文原创性声明}
+\def\npu@ymd{年\qquad 月\qquad 日}
+\def\npu@a@signature{学位论文作者签名}
+\def\npu@s@signature{指导教师签名}
+\long\def\npu@longp@statement{%
+本人完全了解学校有关保护知识产权的规定，即：研究生在校攻读学位期间论文工作的知
+识产权单位属于西北工业大学。学校有权保留并向国家有关部门或机构送交论文的复印件
+和电子版。本人允许论文被查阅和借阅。学校可以将本学位论文的全部或部分内容编入有
+关数据库进行检索，可以采用影印、缩印或扫描等复制手段保存和汇编本学位论文。同时
+本人保证，毕业后结合学位论文研究课题再撰写的文章一律注明作者单位为西北工业大学。
+\par 保密论文待解密后适用本声明。}
+\long\def\npu@longc@statement{%
+秉承学校严谨的学风和优良的科学道德，本人郑重声明：所呈交的学位论文，是本人在导
+师的指导下进行研究工作所取得的成果。尽我所知，除文中已经注明引用的内容和致谢的
+地方外，本论文不包含任何其他个人或集体已经公开发表或撰写过的研究成果，不包含本
+人或其他已申请学位或其他用途使用过的成果。对本文的研究做出重要贡献的个人和集体，
+均已在文中以明确方式表明。
+\par 本人学位论文与资料若有不实，愿意承担一切相关的法律责任。}
+%    \end{macrocode}
+% 与 natbib 的兼容性
+%    \begin{macrocode}
+\AtBeginDocument{% fixed output error when load natbib and use nputhesis.bst.
+  \@ifpackageloaded{natbib}{}{%
+    \let\@ldbibitem\bibitem
+    \def\gobble@ption[#1]{}
+    \def\bibitem{\expandafter\@ldbibitem\gobble@ption}
+    \def\bibpunct#1#2#3#4#5#6{}}}
+%    \end{macrocode}
+% \Finale
+%
 \endinput
+
