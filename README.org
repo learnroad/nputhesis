@@ -24,28 +24,28 @@
 *** 文档选项说明
 1. 由于 =nputhesis= 基于 =book= 实现, =book= 文类的选项这里均能是使用, 如 =twoside=.
 2. =nputhesis= 新定义的选项
-	- =UTF8= : 传递给宏包 =ctexcap=, 用于中文标题处理.
-	- =phd= : 使用博士论文模板, 默认选项.
-	- =ma= : 使用硕士论文模板.
-	- =blankinfo= : 空白页信息开关, 用于在偶数空白页显示 `This Page Intentionally Left Blank!`, 默认不显示.
+  - =UTF8= : 传递给宏包 =ctexcap=, 用于中文标题处理.
+  - =phd= : 使用博士论文模板, 默认选项.
+  - =ma= : 使用硕士论文模板.
+  - =blankinfo= : 空白页信息开关, 用于在偶数空白页显示 `This Page Intentionally Left Blank!`, 默认不显示.
   - =workbib= : 取值有 =none,biblatex,multibib= 三个. 默认为 =none=
     注1: ------------------自动生成论文成果并不符合格式规定--------------------------
     注2: 使用 =biblatex= 选项后, 参考文献输出命令需要更改为 =\printbibliography=
     + =none=
-       不自动生成成果, 使用 =\papersection= 开始论文成果小节.
+      不自动生成成果, 使用 =\papersection= 开始论文成果小节.
     + =biblatex=
-       使用 =biblatex= 处理参考文献, 并可以自动生成成果. 如需自动生成成果可以
-       在 =\Work= 章节使用命令 =\npuprintpub{<name-list>}{<bib-key-list>}=. 
-       上述参数 =<name-list>= 用于名字加黑.
-       #+BEGIN_SRC tex
-           \npuprintpub{ZhangSan, 张三}{A2016, B2017, C2018, D2019}
-       #+END_SRC
+      使用 =biblatex= 处理参考文献, 并可以自动生成成果. 如需自动生成成果可以
+      在 =\Work= 章节使用命令 =\npuprintpub{<name-list>}{<bib-key-list>}=. 
+      上述参数 =<name-list>= 用于名字加黑.
+      #+BEGIN_SRC tex
+        \npuprintpub{ZhangSan, 张三}{A2016, B2017, C2018, D2019}
+      #+END_SRC
     + =multibib=
-       使用 =multibib= 自动生成成果
-       在 =\Work= 章节, 使用 =\npuprintpub[<bibstyle>]{<bib-file>}{<bib-key-list>}=
-       #+BEGIN_SRC tex
-           \npuprintpub[nputhesis]{ref}{A2016, B2017, C2018, D2019}
-       #+END_SRC
+      使用 =multibib= 自动生成成果.
+      在 =\Work= 章节, 使用 =\npuprintpub[<bibstyle>]{<bib-file>}{<bib-key-list>}=
+      #+BEGIN_SRC tex
+        \npuprintpub[nputhesis]{ref}{A2016, B2017, C2018, D2019}
+      #+END_SRC
 
 *** 使用的宏包及定义的环境
 该文类内部已包含宏包 =geometry=, =xcolor=, =fancyhdr=, =titletoc=, =caption=, =ulem=, =amsthm=, =amsmath=, 
