@@ -4,15 +4,19 @@
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesClass{nputhesis}[2018/10/03 v0.5 NPU]
 
+\def\npu@work@bib{none}
+
+\RequirePackage{xkeyval}
+\DeclareOptionX{workbib}{\def\npu@work@bib{#1}}
+\ExecuteOptionsX{workbib=none}
+\ProcessOptionsX \relax
+
 \newif\if@npu@phd
 \newif\if@npu@blankinfo
-\newif\if@npu@work@bib  % TODO
-\@npu@work@bibfalse
 \@npu@blankinfofalse
 \DeclareOption{phd}{\@npu@phdtrue}
 \DeclareOption{ma}{\@npu@phdfalse}
 \DeclareOption{blankinfo}{\@npu@blankinfotrue}
-\DeclareOption{workbib}{\@npu@work@bibtrue}
 \DeclareOption{UTF8}{\PassOptionsToPackage{\CurrentOption}{ctex}}
 \DeclareOption*{\PassOptionsToClass{\CurrentOption}{book}}
 \ExecuteOptions{phd}
@@ -393,6 +397,60 @@
 \newcommand\papersection{\section*{\npu@work@paper}}
 \newcommand\researchsection{\section*{\npu@work@research}}
 
+\RequirePackage{xstring}
+\expandafter\IfSubStr\expandafter{\npu@work@bib}{biblatex}%
+{%
+  \RequirePackage[backend=biber, style=gb7714-2015,
+  %               gbnamefmt=none,  % gbnamefmt option need package version v1.0k.
+                  doi=false]{biblatex}
+  \newcommand{\makeauthorbold}[1]{%
+    \DeclareNameFormat{author}{%
+      \ifthenelse{\value{listcount}=1}
+      {%
+        {\expandafter\IfSubStr{#1}{\namepartfamily\namepartgiven}{\mkbibbold{\namepartfamily\addspace \namepartgiveni}}{\namepartfamily\addspace \namepartgiveni}}
+        %
+      }{\ifnumless{\value{listcount}}{\value{liststop}}
+          {\expandafter\IfSubStr{#1}{\namepartfamily\namepartgiven}{\mkbibbold{\addcomma\addspace \namepartfamily\addspace \namepartgiveni}}{\addcomma\addspace \namepartfamily\addspace \namepartgiveni}}
+          {\expandafter\IfSubStr{#1}{\namepartfamily\namepartgiven}{\mkbibbold{\addcomma\addspace \namepartfamily\addspace \namepartgiveni\isdot}}{\addcomma\addspace \namepartfamily\addspace \namepartgiveni\isdot}}%
+        }
+      \ifthenelse{\value{listcount}<\value{liststop}}
+      {\addcomma\space}
+    }
+  }
+  \newcommand\npuprintpub[2]{
+    \begin{refsection}
+      \makeauthorbold{#1}
+      \nocite{#2}
+      \printbibliography[heading=subbibliography, title=\npu@work@paper]
+    \end{refsection}
+  }%
+  \newcommand\npuchoosebib[2]{#1}
+}%
+{%
+  \newcommand\npuchoosebib[2]{#2}
+  \expandafter\IfSubStr\expandafter{\npu@work@bib}{multibib}
+  {%
+    \RequirePackage{multibib}
+    \newcites{@work}{\npu@work@paper}
+    \newcommand\npuprintpub[3][nputhesis]{%
+      \let\orig@chapter\chapter
+      \let\chapter\section
+      \usecounter{enumiv}
+      \nocite@work{#3}
+      \bibliographystyle@work{#1}
+      \bibliography@work{#2}
+      \let\chapter\orig@chapter
+    }
+  }%
+  {%
+    % \expandafter\IfSubStr\expandafter{\npu@work@bib}{none}{}{}
+    % do nothing, may be output some message
+  }%
+}%
+
+\AtBeginDocument{%
+  \@ifpackageloaded{biblatex}{\renewcommand\npuchoosebib[2]{#1}}{}
+}
 
 \RequirePackage{nomencl}   % add symbol notation
 \RequirePackage{multicol}  % for two column notation

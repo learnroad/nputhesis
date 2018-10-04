@@ -1,58 +1,35 @@
 %% UTF-8
-\documentclass[twoside, workbib, UTF8, phd]{nputhesis}
+\documentclass[twoside, workbib, UTF8, phd, workbib=biblatex]{nputhesis}
 
 \usepackage{lipsum}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%        biblatex     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% 使用 biblatex 处理参考文献, 格式使用 gb7714-2015
-% https://github.com/hushidong/biblatex-gb7714-2015
 % 该宏包已包含在 TeXLive 和 MikTeX 中.
 % gbnamefmt 参数需要 v1.0k 版本.
-\usepackage[backend=biber,
-            style=gb7714-2015,
-%           gbnamefmt=none,
-            doi=false]{biblatex}
+% \usepackage[backend=biber,
+%             style=gb7714-2015,
+% %           gbnamefmt=none,
+%             doi=false]{biblatex}
 
 \addbibresource{ref.bib}        % biblatex 命令. 添加参考文献文件, 必须加后缀.
-% % 如果想使用 biblatex 自动生成成果, 可以取消下面命令 \papersection 的定义
-% % 在 \Work 章节使用命令 \papersection{<bib-key-list>}
-% % e.g.
-% %         \papersection{Knuth1986, Yang1000}
-% % 注: ------------------自动生成并不符合格式规定-------------------------- 
-% \renewcommand\papersection[1]{
-%   \begin{refsection}
-%     \nocite{#1}
-%     \makeatletter
-%     \printbibliography[heading=subbibliography, title=\npu@work@paper]
-%     \makeatother
-%   \end{refsection}
-% }
-%%%%%%%%%%%%%%%%%%%%%%%%%%        biblatex     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%        multibib     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% % 成果作为参考文献自动生成的一种方法.
-% % 由于 multibib 与上面的 biblatex 冲突, 只能使用其中的一种.
-% % 如果使用 multibib 请注释掉上面使用 biblatex 的部分并取消下面的注释.
-% % 以及后面的 \printbibliography 行.
-% \usepackage{multibib}
-% \makeatletter
-% \newcites{@work}{\npu@work@paper}
-% \renewcommand\papersection[3][nputhesis]{%
-%   \let\orig@chapter\chapter
-%   \let\chapter\section
-%   \usecounter{enumiv}
-%   \nocite@work{#3}
-%   \bibliographystyle@work{#1}
-%   \bibliography@work{#2}
-%   \let\chapter\orig@chapter
-% }
-% \makeatother
-% % 在 \Work 章节, 使用上述重定义的 \papersection 命令, 并注释掉原来的无参数命令.
-% % \papersection[<bibstyle>]{<bib-file>}{<bib-key-list>}
-% % e.g.
-% %     \papersection[nputhesis]{ref}{zhao2017, qian2018, sun2019}
-% % 注: ------------------自动生成并不符合格式规定-------------------------- 
-%%%%%%%%%%%%%%%%%%%%%%%%%%        multibib     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%        workbib      %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% workbib 选项
+% + none
+%    不自动生成成果
+% + biblatex 
+%    使用 biblatex 处理参考文献并可以自动生成成果. 如需自动生成成果可以
+%    在 \Work 章节可以使用命令 \npuprintpub{<name-list>}{<bib-key-list>}.
+%    上述参数 <name-list> 用于名字加黑
+%    e.g.
+%        \npuprintpub{ZhangSan, 张三}{A2016, B2017, C2018, D2019}
+% + multibib
+%    使用 multibib 自动生成成果
+%    在 \Work 章节, 使用 \npuprintpub[<bibstyle>]{<bib-file>}{<bib-key-list>}
+%    e.g.
+%        \npuprintpub[nputhesis]{ref}{A2016, B2017, C2018, D2019}
+
+% 注1: ------------------自动生成并不符合格式规定--------------------------
+%%%%%%%%%%%%%%%%%%%%%%%%%%        workbib      %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \newtheorem{thm}{定理}[section]
 \theoremstyle{plain}
@@ -172,29 +149,33 @@
 \chapter{实现}
 \section{思路}
 \section{代码}
-
+\nocite{A2016, B2017, C2018, D2019}
 \backmatter
-% 以下两种参考文献格式, 根据实际宏包使用情况添加
-\printbibliography             % biblatex 输出参考文件方式
-% \bibliographystyle{nputhesis}  % 传统输出参考文献方式
-% \bibliography{ref}             % 传统输出参考文献方式
-
+% 根据实际宏包使用情况自动选择, 不需更改
+\npuchoosebib{%
+  \printbibliography             % 如果使用了 biblatex 宏包
+}{%
+  \bibliographystyle{nputhesis}  % 传统输出参考文献方式
+  \bibliography{ref}             % 传统输出参考文献方式
+}
 \Appendix  % 如果有多个附录, 可重复使用该命令, 自动按字母编号.
 
 \Thanks     % 致谢
 
 \Work
-%  biblatex 方式 \papersection{<bib-key-list>}
-% \papersection{Knuth1986}
+% workbib 的三个选项
 
-%  multibib 方式 \papersection[<bibstyle>]{<bib-file>}{<bib-key-list>}
-% \papersection[nputhesis]{ref}{Knuth1986}
+% biblatex 方式 \npuprintpub{<bib-key-list>}
+\npuprintpub{ZhangSan, 张三}{A2016, B2017, C2018, D2019}
 
-%  none  方式 即手动书写方式
-\papersection  % 以下填写发表论文情况
-1. 论文1
+% multibib 方式 \npuprintpub[<bibstyle>]{<bib-file>}{<bib-key-list>}
+% \npuprintpub[nputhesis]{ref}{A2016, B2017}
 
-2. 论文2
+% none  方式 即手动书写方式
+% \papersection  % 以下填写发表论文情况
+% 1. 论文1
+
+% 2. 论文2
 
 \researchsection % 以下填写参加科研情况
 1. 我的研究项目1
